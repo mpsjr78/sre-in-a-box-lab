@@ -51,3 +51,26 @@ This lab is about breaking things intentionally to validate resilience. Below is
 cd infrastructure
 terraform init
 terraform apply -auto-approve
+```
+
+**2. Deploy the Microservices & Ingress:**
+```bash
+kubectl apply -f app/yelb-deployment.yaml
+kubectl apply -f app/yelb-ingress.yaml
+```
+### Access the app at http://localhost:8080
+
+**3. Deploy Observability Stack:**
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm install monitoring prometheus-community/kube-prometheus-stack -f observability/prometheus-values.yaml -n monitoring --create-namespace
+```
+### Forward port 3000 to access Grafana and import the custom dashboard from observability/yelb-dashboard.json
+
+**4. Inject Chaos (Kill the Database):**
+```bash
+helm repo add chaos-mesh https://charts.chaos-mesh.org
+helm install chaos-mesh chaos-mesh/chaos-mesh -n chaos-mesh --create-namespace --set dashboard.securityMode=false
+kubectl apply -f chaos-engineering/kill-db.yaml
+```
+### Built to demonstrate continuous improvement, resilience, and site reliability engineering principles.
